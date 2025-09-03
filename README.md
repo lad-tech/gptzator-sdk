@@ -1,8 +1,8 @@
-**test-masha-sdk2**
+**Gptzator-sdk**
 
 ***
 
-# test-masha-sdk2
+# Gptzator-sdk
 
 ## Classes
 

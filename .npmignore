@@ -1,0 +1,9 @@
+src/
+dist/**/*.map
+.github
+.eslintrc.js
+.prettierrc.json
+.releaserc
+commitlint.config.js
+lefthook.yml
+tsconfig.json
