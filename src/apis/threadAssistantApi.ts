@@ -220,4 +220,19 @@ export class ThreadAssistantApi {
         );
         return data;
     }
+
+    /**
+     * @param threadId Идентификатор потока
+     * @returns Экземпляр EventSource для обработки событий
+     */
+    getThreadMessageStream(threadId: string): EventSource {
+        const baseURL = this.client.http.defaults.baseURL;
+        if (!baseURL) {
+            throw new Error("Axios instance must have baseURL for SSE connection");
+        }
+
+        const url = `${baseURL}/assistant/threads/${threadId}/stream?all=1`;
+
+        return new EventSource(url);
+    }
 }
