@@ -231,7 +231,7 @@ export class ThreadAssistantApi {
             throw new Error("Axios instance must have baseURL for SSE connection");
         }
 
-        const url = `${baseURL}/assistant/threads/${threadId}/stream?all=1`;
+        const url = `${baseURL}thread/${threadId}/stream?all=1`;
 
         return new EventSource(url);
     }
