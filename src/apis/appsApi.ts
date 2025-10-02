@@ -8,6 +8,8 @@ import {
   TSettingsTemplateDTO,
   TTagsDTO,
 } from '../types/apps';
+import {apiCall} from "../utils/apiCall";
+import qs from 'qs';
 
 /**
  * Класс для работы с API приложений
@@ -18,6 +20,7 @@ export class AppsApi {
   /**
    * Получение списка приложений с фильтром и пагинацией
    * @param params Параметры фильтрации и пагинации
+   * @throws {ApiError} Когда запрос не удался
    */
   async getApps(params: {
     tag?: string;
@@ -26,124 +29,163 @@ export class AppsApi {
     author?: string;
     appsPerPage?: number;
   }): Promise<TAppsDTO> {
-    const query: any = { name: { contains: params.search } };
-    if (params.tag) query.tags = { equals: params.tag };
-    if (params.author) query.author = { equals: params.author };
+    return apiCall("AppsApi.getApps", async () => {
+      const query: any = { name: { contains: params.search } };
+      if (params.tag) query.tags = { equals: params.tag };
+      if (params.author) query.author = { equals: params.author };
 
-    const { data } = await this.client.http.get<TAppsDTO>('/apps', {
-      params: { ...query, limit: params.appsPerPage },
+      const { data } = await this.client.http.get<TAppsDTO>('/apps', {
+        params: { ...query, limit: params.appsPerPage },
+      });
+
+      return data;
     });
 
-    return data;
   }
 
   /**
    * Создание нового приложения
    * @param author Автор приложения
    * @param name Название приложения
+   * @returns {Promise<TApp>}
+   * @throws {ApiError}
    */
   async createApp(author: string, name = 'Новый навык'): Promise<TApp> {
-    const { data } = await this.client.http.post<{ doc: TApp; message: string }>('/apps?depth=0', {
-      author,
-      name,
+    return apiCall("AppsApi.createApp", async () => {
+      const { data } = await this.client.http.post<{ doc: TApp; message: string }>('/apps?depth=0', {
+        author,
+        name,
+      });
+      return data.doc;
     });
-    return data.doc;
   }
 
   /**
    * Обновление приложения
    * @param id ID приложения
    * @param data Данные для обновления
+   * @returns {Promise<TApp>}
+   * @throws {ApiError}
    */
   async updateApp(id: string, data: any): Promise<TApp> {
-    const response = await this.client.http.patch<TApp>(`/apps/${id}?depth=0`, data);
-    return response.data;
+    return apiCall("AppsApi.updateApp", async () => {
+      const response = await this.client.http.patch<TApp>(`/apps/${id}?depth=0`, data);
+      return response.data;
+    });
   }
 
   /**
    * Удаление приложения
    * @param id ID приложения
+   * @returns {Promise<TAppsDTO>}
+   * @throws {ApiError}
    */
   async deleteApp(id: string): Promise<TAppsDTO> {
-    const response = await this.client.http.delete<TAppsDTO>('/apps', {
-      params: { where: { id: { equals: id } } },
+    return apiCall("AppsApi.deleteApp", async () => {
+      const stringified = qs.stringify({ depth: 0, where: { id: { equals: id } } }, { addQueryPrefix: true });
+      const { data } = await this.client.http.delete<TAppsDTO>(`/apps${stringified}`);
+      return data;
     });
-    return response.data;
   }
 
   /**
    * Получение приложения по ID
    * @param id ID приложения
+   * @returns {Promise<TApp>}
+   * @throws {ApiError}
    */
   async getAppById(id: string): Promise<TApp> {
-    const { data } = await this.client.http.get<TApp>(`/apps/${id}?depth=0`);
-    return data;
+    return apiCall("AppsApi.getAppById", async () => {
+      const { data } = await this.client.http.get<TApp>(`/apps/${id}?depth=0`);
+      return data;
+    });
   }
 
   /**
    * Получение OAuth клиентов для приложения
    * @param redirectUri URI для редиректа
+   * @returns {Promise<TOauthClient[]>}
+   * @throws {ApiError}
    */
   async getOauthClients(redirectUri: string): Promise<TOauthClient[]> {
-    const { data } = await this.client.http.get<{ clients: TOauthClient[] }>(
-      `/oauth_clients/oauth/clients?redirectUri=${redirectUri}`,
-    );
-    return data.clients;
+    return apiCall("AppsApi.getOauthClients", async () => {
+      const { data } = await this.client.http.get<{ clients: TOauthClient[] }>(`/oauth_clients/oauth/clients?redirectUri=${encodeURIComponent(redirectUri)}`);
+      return data.clients;
+    });
   }
 
   /**
    * Логаут OAuth клиента
    * @param clientId ID клиента
+   * @returns {Promise<void>}
+   * @throws {ApiError}
    */
   async logoutOauthClient(clientId: string): Promise<void> {
-    await this.client.http.post(`/oauth_clients/oauth/clients/${clientId}/logout`);
+    return apiCall("AppsApi.logoutOauthClient", async () => {
+      await this.client.http.post(`/oauth_clients/oauth/clients/${clientId}/logout`);
+    });
   }
 
   /**
    * Получение меню приложений
+   * @returns {Promise<TAppsMenu[]>}
+   * @throws {ApiError}
    */
   async getAppsMenu(): Promise<TAppsMenu[]> {
-    const { data } = await this.client.http.get<{ menu: TAppsMenu[] }>('/apps_menu/tree');
-    return data.menu;
+    return apiCall("AppsApi.getAppsMenu", async () => {
+      const { data } = await this.client.http.get<{ menu: TAppsMenu[] }>(`/apps_menu/tree`);
+      return data.menu;
+    });
   }
 
   /**
    * Получение избранных приложений
+   * @returns {Promise<TApp[]>}
+   * @throws {ApiError}
    */
   async getFavouriteApps(): Promise<TApp[]> {
-    const { data } = await this.client.http.get<TApp[]>('/apps/favourites?depth=0');
-    return data;
+    return apiCall("AppsApi.getFavouriteApps", async () => {
+      const { data } = await this.client.http.get<TApp[]>(`/apps/favourites?depth=0`);
+      return data;
+    });
   }
 
   /**
    * Обновление статуса избранного приложения
    * @param id ID приложения
    * @param isFavourite Статус избранного
+   * @returns {Promise<void>}
+   * @throws {ApiError}
    */
   async updateIsFavourite(id: string, isFavourite: boolean): Promise<void> {
-    if (isFavourite) {
-      await this.client.http.post('/users/favourites', { id });
-    } else {
-      await this.client.http.delete(`/users/favourites/${id}`);
-    }
+    return apiCall("AppsApi.updateIsFavourite", async () => {
+      if (isFavourite) {
+        await this.client.http.post(`/users/favourites`, { id });
+      } else {
+        await this.client.http.delete(`/users/favourites/${id}`);
+      }
+    });
   }
 
   /**
    * Получение тегов приложений
+   * @param limit Максимум тегов (по умолчанию 50)
+   * @returns {Promise<TTagsDTO>}
+   * @throws {ApiError}
    */
-  async getTags(): Promise<TTagsDTO> {
-    const { data } = await this.client.http.get<TTagsDTO>('/tags', {
-      params: { limit: 50, page: 1 },
+  async getTags(limit = 50): Promise<TTagsDTO> {
+    return apiCall("AppsApi.getTags", async () => {
+      const stringified = qs.stringify({ limit, page: 1 }, { addQueryPrefix: true });
+      const { data } = await this.client.http.get<TTagsDTO>(`/tags${stringified}`);
+      return data;
     });
-    return data;
   }
 
   /**
    * Получение шаблонов настроек приложения
-   * @param appId ID приложения
-   * @param search Поисковая строка
-   * @param page Номер страницы
-   * @param templatesPerPage Количество шаблонов на странице
+   * @param params Параметры: appId, search, page, templatesPerPage
+   * @returns {Promise<TSettingsTemplateDTO>}
+   * @throws {ApiError}
    */
   async getSettingsTemplates(params: {
     appId: string;
@@ -151,58 +193,67 @@ export class AppsApi {
     page: number;
     templatesPerPage?: number;
   }): Promise<TSettingsTemplateDTO> {
-    const query: any = { app: { equals: params.appId } };
-    if (params.search) query.name = { contains: params.search };
+    return apiCall("AppsApi.getSettingsTemplates", async () => {
+      const query: any = { app: { equals: params.appId } };
+      if (params.search) query.name = { contains: params.search };
 
-    const { data } = await this.client.http.get<TSettingsTemplateDTO>('/apps_settings', {
-      params: { ...query, limit: params.templatesPerPage },
+      const { data } = await this.client.http.get<TSettingsTemplateDTO>('/apps_settings', {
+        params: { ...query, limit: params.templatesPerPage },
+      });
+      return data;
     });
-    return data;
   }
 
   /**
    * Активация шаблона настроек
    * @param id ID шаблона
+   * @returns {Promise<TSettingsTemplate>}
+   * @throws {ApiError}
    */
   async activateTemplate(id: string): Promise<TSettingsTemplate> {
-    const { data } = await this.client.http.post<TSettingsTemplate>(
-      `/apps_settings/${id}/activate`,
-    );
-    return data;
+    return apiCall("AppsApi.activateTemplate", async () => {
+      const { data } = await this.client.http.post<TSettingsTemplate>(`/apps_settings/${id}/activate`);
+      return data;
+    });
   }
 
   /**
    * Создание шаблона настроек
-   * @param data Данные для нового шаблона
+   * @param data Данные шаблона
+   * @returns {Promise<TSettingsTemplate>}
+   * @throws {ApiError}
    */
   async createSettingsTemplate(data: any): Promise<TSettingsTemplate> {
-    const { data: template } = await this.client.http.post<TSettingsTemplate>(
-      '/apps_settings',
-      data,
-    );
-    return template;
+    return apiCall("AppsApi.createSettingsTemplate", async () => {
+      const { data: template } = await this.client.http.post<TSettingsTemplate>(`/apps_settings`, data);
+      return template;
+    });
   }
 
   /**
    * Обновление шаблона настроек
    * @param id ID шаблона
    * @param data Данные для обновления
+   * @returns {Promise<TSettingsTemplate>}
+   * @throws {ApiError}
    */
   async updateSettingsTemplate(id: string, data: any): Promise<TSettingsTemplate> {
-    const { data: template } = await this.client.http.patch<TSettingsTemplate>(
-      `/apps_settings/${id}?depth=0`,
-      data,
-    );
-    return template;
+    return apiCall("AppsApi.updateSettingsTemplate", async () => {
+      const { data: template } = await this.client.http.patch<TSettingsTemplate>(`/apps_settings/${id}?depth=0`, data);
+      return template;
+    });
   }
 
   /**
    * Удаление шаблона настроек
    * @param id ID шаблона
+   * @returns {Promise<void>}
+   * @throws {ApiError}
    */
   async deleteSettingsTemplate(id: string): Promise<void> {
-    await this.client.http.delete(`/apps_settings`, {
-      params: { where: { id: { equals: id } } },
+    return apiCall("AppsApi.deleteSettingsTemplate", async () => {
+      const stringified = qs.stringify({ depth: 0, where: { id: { equals: id } } }, { addQueryPrefix: true });
+      await this.client.http.delete(`/apps_settings${stringified}`);
     });
   }
 }

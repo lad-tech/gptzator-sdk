@@ -7,6 +7,7 @@ import {
     TLlmModelsDTO,
     TEmbeddingModelDTO,
 } from '../types/models';
+import {apiCall} from "../utils/apiCall";
 
 /**
  * Класс для работы с моделями
@@ -16,48 +17,61 @@ export class ModelsApi {
 
     /**
      * Получение списка моделей
-     * @returns Список моделей
+     * @returns {Promise<TModel[]>} Список моделей
+     * @throws {ApiError}
      */
     async getModels(): Promise<TModel[]> {
-        const { data } = await this.client.http.get<TModelsDTO>(`models`, {
-            params: { limit: 20 }, // MODELS_PER_PAGE
+        return apiCall("ModelsApi.getModels", async () => {
+            const { data } = await this.client.http.get<TModelsDTO>(`models`, {
+                params: { limit: 20 },
+            });
+            return data.docs;
         });
-        return data.docs;
     }
 
     /**
      * Получение списка активных моделей
      * @returns Список активных моделей
+     * @throws {ApiError}
      */
     async getActiveModels(): Promise<TModel[]> {
-        const { data } = await this.client.http.get<TModelsDTO>(`models`, {
-            params: {
-                limit: 20, // MODELS_PER_PAGE
-                where: { active: { equals: true } },
-            },
+        return apiCall("ModelsApi.getActiveModels", async () => {
+            const { data } = await this.client.http.get<TModelsDTO>(`models`, {
+                params: {
+                    limit: 20,
+                    where: { active: { equals: true } },
+                },
+            });
+            return data.docs;
         });
-        return data.docs;
     }
 
     /**
      * Получение списка LLM моделей
-     * @returns Список LLM моделей
+     * @returns {Promise<TLlmModel[]>} Список LLM моделей
+     * @throws {ApiError}
      */
     async getLlmModels(): Promise<TLlmModel[]> {
-        const { data } = await this.client.http.get<TLlmModelsDTO>(`llm_models`, {
-            params: { limit: 20 }, // LLM_MODELS_PER_PAGE
+        return apiCall("ModelsApi.getLlmModels", async () => {
+            const { data } = await this.client.http.get<TLlmModelsDTO>(`llm_models`, {
+                params: { limit: 20 },
+            });
+            return data.docs;
         });
-        return data.docs;
+
     }
 
     /**
-     * Получение списка моделей эмбеддингов
-     * @returns Список моделей эмбеддингов
+     * Получение embedding-моделей
+     * @returns {Promise<TEmbeddingModel[]>} Список embedding-моделей
+     * @throws {ApiError}
      */
     async getEmbeddingModels(): Promise<TEmbeddingModel[]> {
-        const { data } = await this.client.http.get<TEmbeddingModelDTO>(
-                `embedding_models`
-        );
-        return data.docs;
+        return apiCall("ModelsApi.getEmbeddingModels", async () => {
+            const { data } = await this.client.http.get<TEmbeddingModelDTO>(
+                    `embedding_models`
+            );
+            return data.docs;
+        });
     }
 }

@@ -1,7 +1,5 @@
-// src/apis/ThreadsApi.ts
 import { GptzatorClient } from "../client";
 import {
-    TThread,
     TThreadDTO,
     TThreadsDTO,
     TThreadsSearchParams,
@@ -9,6 +7,8 @@ import {
     TMessage,
     TGenerationTypeDTO,
 } from "../types/threads";
+import {apiCall} from "../utils/apiCall";
+import qs from 'qs';
 
 /**
  * API для работы с чатами (threads) и сообщениями.
@@ -18,16 +18,23 @@ export class ThreadsApi {
     constructor(private readonly client: GptzatorClient) {}
 
     /**
-     * Получить список потоков (чатов).
-     *
-     * @param {TThreadsSearchParams} [params] - Параметры поиска и пагинации.
-     * @param {string} [params.search] - Поисковая строка по названию.
-     * @param {number} params.page - Номер страницы.
-     * @returns {Promise<TThreadsDTO>} Список потоков с пагинацией.
+     * Получить список тредов с пагинацией и поиском
+     * @param params Параметры: search?, page
+     * @returns {Promise<TThreadsDTO>}
+     * @throws {ApiError}
      */
     async getThreads(params?: TThreadsSearchParams): Promise<TThreadsDTO> {
-        const { data } = await this.client.http.get<TThreadsDTO>("threads", { params });
-        return data;
+        return apiCall("ThreadsApi.getThreads", async () => {
+            if (!params) {
+                const { data } = await this.client.http.get<TThreadsDTO>(`/threads`);
+                return data;
+            }
+            const { search, page } = params;
+            const where = search ? { title: { contains: search } } : undefined;
+            const stringified = qs.stringify({ ...(where ? { where } : {}), limit: 20, page }, { addQueryPrefix: true });
+            const { data } = await this.client.http.get<TThreadsDTO>(`/threads${stringified}`);
+            return data;
+        });
     }
 
     /**
@@ -35,10 +42,13 @@ export class ThreadsApi {
      *
      * @param {string} id - Уникальный идентификатор потока.
      * @returns {Promise<TThreadDTO>} Данные о потоке.
+     * @throws {ApiError}
      */
     async getThreadById(id: string): Promise<TThreadDTO> {
-        const { data } = await this.client.http.get<TThreadDTO>(`threads/${id}`);
-        return data;
+        return apiCall("ThreadsApi.getThreadById", async () => {
+            const { data } = await this.client.http.get<TThreadDTO>(`/threads/${id}`);
+            return data;
+        });
     }
 
     /**
@@ -50,6 +60,7 @@ export class ThreadsApi {
      * @param {string[]} [data.vaultIds] - Идентификаторы привязанных хранилищ.
      * @param {string[]} [data.fileIds] - Идентификаторы файлов.
      * @returns {Promise<TThreadDTO>} Созданный поток.
+     * @throws {ApiError}
      */
     async createThread(data: {
         id: string;
@@ -57,8 +68,10 @@ export class ThreadsApi {
         vaultIds?: string[];
         fileIds?: string[];
     }): Promise<TThreadDTO> {
-        const { data: newThread } = await this.client.http.post<TThreadDTO>("threads/create", data);
-        return newThread
+        return apiCall("ThreadsApi.createThread", async () => {
+            const { data: newThread } = await this.client.http.post<TThreadDTO>("threads/create", data);
+            return newThread
+        });
     }
 
     /**
@@ -66,10 +79,13 @@ export class ThreadsApi {
      *
      * @param {string} id - Идентификатор потока.
      * @returns {Promise<TThreadDTO>} Удалённый поток.
+     * @throws {ApiError}
      */
     async deleteThread(id: string): Promise<TThreadDTO> {
-        const { data } = await this.client.http.delete<TThreadDTO>(`threads/${id}`);
-        return data;
+        return apiCall("ThreadsApi.deleteThread", async () => {
+            const { data } = await this.client.http.delete<TThreadDTO>(`threads/${id}`);
+            return data;
+        });
     }
 
     /**
@@ -79,16 +95,19 @@ export class ThreadsApi {
      * @param {string} data.id - Идентификатор потока.
      * @param {string[]} data.vaultIds - Список идентификаторов хранилищ.
      * @returns {Promise<TThreadDTO>} Обновлённый поток.
+     * @throws {ApiError}
      */
     async updateThreadVault(data: {
         id: string;
         vaultIds: string[];
     }): Promise<TThreadDTO> {
-        const { data: threadData } = await this.client.http.post<TThreadDTO>(
-                `threads/${data.id}/set-context`,
-                { vaultIds: data.vaultIds }
-        );
-        return threadData;
+        return apiCall("ThreadsApi.updateThreadVault", async () => {
+            const { data: threadData } = await this.client.http.post<TThreadDTO>(
+                    `threads/${data.id}/set-context`,
+                    { vaultIds: data.vaultIds }
+            );
+            return threadData;
+        });
     }
 
     /**
@@ -98,23 +117,29 @@ export class ThreadsApi {
      * @param {string} params.threadId - Идентификатор потока.
      * @param {number} [params.page=1] - Номер страницы.
      * @returns {Promise<TMessagesDTO>} Список сообщений.
+     * @throws {ApiError}
      */
     async getMessages(params: {
         threadId: string;
         page?: number;
     }): Promise<TMessagesDTO> {
-        const { data } = await this.client.http.get<TMessagesDTO>("threads_messages", { params });
-        return data;
+        return apiCall("ThreadsApi.getMessages", async () => {
+            const { data } = await this.client.http.get<TMessagesDTO>("threads_messages", { params });
+            return data;
+        });
     }
 
     /**
      * Получить список типов генерации.
      *
      * @returns {Promise<TGenerationTypeDTO>} Список доступных типов генерации.
+     * @throws {ApiError}
      */
     async getGenerationTypes(): Promise<TGenerationTypeDTO> {
-        const { data } = await this.client.http.get<TGenerationTypeDTO>("threads_generation_types");
-        return data;
+        return apiCall("ThreadsApi.getGenerationTypes", async () => {
+            const { data } = await this.client.http.get<TGenerationTypeDTO>("threads_generation_types");
+            return data;
+        });
     }
 
     /**
@@ -124,15 +149,19 @@ export class ThreadsApi {
      * @param {string} data.threadId - Идентификатор потока.
      * @param {string} data.typeId - Идентификатор типа генерации.
      * @returns {Promise<TThreadDTO>} Обновлённый поток.
+     * @throws {ApiError}
      */
     async updateGenerationType(data: {
         threadId: string;
         typeId: string;
     }): Promise<TThreadDTO> {
-        const { data: threadData } = await this.client.http.patch<TThreadDTO>(`threads/${data.threadId}`, {
-            generationType: data.typeId,
+        return apiCall("ThreadsApi.updateGenerationType", async () => {
+            const { data: threadData } = await this.client.http.patch<TThreadDTO>(`threads/${data.threadId}`, {
+                generationType: data.typeId,
+            });
+            return threadData;
         });
-        return threadData;
+
     }
 
     /**
@@ -142,15 +171,19 @@ export class ThreadsApi {
      * @param {string} data.threadId - Идентификатор потока.
      * @param {string} data.modelId - Идентификатор модели.
      * @returns {Promise<TThreadDTO>} Обновлённый поток.
+     * @throws {ApiError}
      */
     async updateThreadModel(data: {
         threadId: string;
         modelId: string;
     }): Promise<TThreadDTO> {
-        const { data: threadData } = await this.client.http.patch<TThreadDTO>(`threads/${data.threadId}`, {
-            model: data.modelId,
+        return apiCall("ThreadsApi.updateThreadModel", async () => {
+            const { data: threadData } = await this.client.http.patch<TThreadDTO>(`threads/${data.threadId}`, {
+                model: data.modelId,
+            });
+            return threadData;
         });
-        return threadData;
+
     }
 
     /**
@@ -160,16 +193,20 @@ export class ThreadsApi {
      * @param {string} data.threadId - Идентификатор потока.
      * @param {string} data.text - Текст сообщения.
      * @returns {Promise<TMessage>} Созданное сообщение.
+     * @throws {ApiError}
      */
     async createMessage(data: {
         text: string;
         threadId: string;
     }): Promise<TMessage> {
-        const { data: message } = await this.client.http.post<TMessage>(
-                `threads/${data.threadId}/messages`,
-                { text: data.text }
-        );
-        return message;
+        return apiCall("ThreadsApi.createMessage", async () => {
+            const { data: message } = await this.client.http.post<TMessage>(
+                    `threads/${data.threadId}/messages`,
+                    { text: data.text }
+            );
+            return message;
+        });
+
     }
 
     /**
@@ -180,17 +217,21 @@ export class ThreadsApi {
      * @param {string} data.messageId - Идентификатор сообщения.
      * @param {string} data.content - Новый контент сообщения.
      * @returns {Promise<TMessage>} Обновлённое сообщение.
+     * @throws {ApiError}
      */
     async editMessage(data: {
         content: string;
         messageId: string;
         threadId: string;
     }): Promise<TMessage> {
-        const { data: message } = await this.client.http.patch<TMessage>(
-                `threads/${data.threadId}/messages/${data.messageId}`,
-                { content: data.content }
-        );
-        return message;
+        return apiCall("ThreadsApi.editMessage", async () => {
+            const { data: message } = await this.client.http.patch<TMessage>(
+                    `threads/${data.threadId}/messages/${data.messageId}`,
+                    { content: data.content }
+            );
+            return message;
+        });
+
     }
 
     /**
@@ -200,15 +241,19 @@ export class ThreadsApi {
      * @param {string} data.threadId - Идентификатор потока.
      * @param {string} data.messageId - Идентификатор сообщения.
      * @returns {Promise<TMessage>} Удалённое сообщение.
+     * @throws {ApiError}
      */
     async deleteMessage(data: {
         messageId: string;
         threadId: string;
     }): Promise<TMessage> {
-        const { data: message } = await this.client.http.delete<TMessage>(
-                `threads/${data.threadId}/messages/${data.messageId}`
-        );
-        return message;
+        return apiCall("ThreadsApi.deleteMessage", async () => {
+            const { data: message } = await this.client.http.delete<TMessage>(
+                    `threads/${data.threadId}/messages/${data.messageId}`
+            );
+            return message;
+        });
+
     }
 
     /**
@@ -218,15 +263,19 @@ export class ThreadsApi {
      * @param {string} data.threadId - Идентификатор потока.
      * @param {string} data.messageId - Идентификатор сообщения.
      * @returns {Promise<TMessage>} Новая версия сообщения.
+     * @throws {ApiError}
      */
     async regenerateMessage(data: {
         messageId: string;
         threadId: string;
     }): Promise<TMessage> {
-        const { data: message } = await this.client.http.post<TMessage>(
-                `threads/${data.threadId}/messages/${data.messageId}/regenerate`
-        );
-        return message;
+        return apiCall("ThreadsApi.regenerateMessage", async () => {
+            const { data: message } = await this.client.http.post<TMessage>(
+                    `threads/${data.threadId}/messages/${data.messageId}/regenerate`
+            );
+            return message;
+        });
+
     }
 
     /**
@@ -236,16 +285,19 @@ export class ThreadsApi {
      * @param {string} data.threadId - Идентификатор потока.
      * @param {string[]} data.fileIds - Список идентификаторов файлов.
      * @returns {Promise<TMessage>} Сообщение с прикреплёнными файлами.
+     * @throws {ApiError}
      */
     async attachFilesToThread(data: {
         threadId: string;
         fileIds: string[];
     }): Promise<TMessage> {
-        const { data: message } = await this.client.http.post<TMessage>(
-                `threads/${data.threadId}/files/attach`,
-                { fileIds: data.fileIds }
-        );
+        return apiCall("ThreadsApi.attachFilesToThread", async () => {
+            const { data: message } = await this.client.http.post<TMessage>(
+                    `threads/${data.threadId}/files/attach`,
+                    { fileIds: data.fileIds }
+            );
+            return message;
+        });
 
-        return message;
     }
 }

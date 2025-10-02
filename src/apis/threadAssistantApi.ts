@@ -6,6 +6,8 @@ import {
     TMessagesSearchParams,
     TMessage,
 } from '../types/threadAssistant';
+import {apiCall} from "../utils/apiCall";
+import {ApiError} from "../errors/ApiError";
 
 /**
  * Класс для работы с тредами ассистента
@@ -18,18 +20,21 @@ export class ThreadAssistantApi {
      * @param id ID рабочего пространства
      * @param page Номер страницы
      * @param search Поисковый запрос
-     * @returns Коллекция тредов
+     * @returns {Promise<TThreadsAssistantDTO>} Коллекция тредов
+     * @throws {ApiError}
      */
     async getThreadsByWorkspaceId(params: {
         id: string;
         page: number;
         search?: string;
     }): Promise<TThreadsAssistantDTO> {
-        const { data } = await this.client.http.get<TThreadsAssistantDTO>(
-                `assistant__threads`,
-                { params }
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.getThreadsByWorkspaceId", async () => {
+            const { data } = await this.client.http.get<TThreadsAssistantDTO>(
+                    `assistant__threads`,
+                    { params }
+            );
+            return data;
+        });
     }
 
     /**
@@ -37,36 +42,42 @@ export class ThreadAssistantApi {
      * @param id ID ассистента
      * @param page Номер страницы
      * @param search Поисковый запрос
-     * @returns Коллекция тредов
+     * @returns {Promise<TThreadsAssistantDTO>} Коллекция тредов
+     * @throws {ApiError}
      */
     async getThreadsByAssistantId(params: {
         id: string;
         page: number;
         search?: string;
     }): Promise<TThreadsAssistantDTO> {
-        const { data } = await this.client.http.get<TThreadsAssistantDTO>(
-                `assistant__threads`,
-                { params }
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.getThreadsByAssistantId", async () => {
+            const { data } = await this.client.http.get<TThreadsAssistantDTO>(
+                    `assistant__threads`,
+                    { params }
+            );
+            return data;
+        });
     }
 
     /**
      * Создание треда в workspace
      * @param id ID рабочего пространства
      * @param title Заголовок треда
-     * @returns Созданный тред
+     * @returns {Promise<TThreadAssistantDTO>} Созданный тред
+     * @throws {ApiError}
      */
     async createThreadByWorkspaceId(params: {
         id: string;
         title: string;
     }): Promise<TThreadAssistantDTO> {
-        const { id, ...body } = params;
-        const { data } = await this.client.http.post<TThreadAssistantDTO>(
-                `assistant/workspaces/${id}/threads?depth=0`,
-                body
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.createThreadByWorkspaceId", async () => {
+            const { id, ...body } = params;
+            const { data } = await this.client.http.post<TThreadAssistantDTO>(
+                    `assistant/workspaces/${id}/threads?depth=0`,
+                    body
+            );
+            return data;
+        });
     }
 
     /**
@@ -74,82 +85,97 @@ export class ThreadAssistantApi {
      * @param id ID ассистента
      * @param title Заголовок
      * @param modeId (опционально) ID режима
-     * @returns Созданный тред
+     * @returns {Promise<TThreadAssistantDTO>} Созданный тред
+     * @throws {ApiError}
      */
     async createThreadByAssistantId(params: {
         id: string;
         title: string;
         modeId?: string;
     }): Promise<TThreadAssistantDTO> {
-        const { id, ...body } = params;
-        const { data } = await this.client.http.post<TThreadAssistantDTO>(
-                `/assistant/assistants/${id}/threads`,
-                body
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.createThreadByAssistantId", async () => {
+            const { id, ...body } = params;
+            const { data } = await this.client.http.post<TThreadAssistantDTO>(
+                    `/assistant/assistants/${id}/threads`,
+                    body
+            );
+            return data;
+        });
     }
 
     /**
      * Обновление треда ассистента
      * @param thread Обновлённый объект треда
-     * @returns Обновлённый тред
+     * @returns {Promise<TThreadAssistantDTO>} Обновлённый тред
+     * @throws {ApiError}
      */
     async updateThreadAssistant(
             thread: TThreadAssistantDTO
     ): Promise<TThreadAssistantDTO> {
-        const { id, ...body } = thread;
-        const { data } = await this.client.http.patch<TThreadAssistantDTO>(
-                `assistant__threads/${id}?depth=0`,
-                body
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.updateThreadAssistant", async () => {
+            const { id, ...body } = thread;
+            const { data } = await this.client.http.patch<TThreadAssistantDTO>(
+                    `assistant__threads/${id}?depth=0`,
+                    body
+            );
+            return data;
+        });
     }
 
     /**
      * Получение треда по ID
      * @param id ID треда
-     * @returns Тред
+     * @returns {Promise<TThreadAssistantDTO>} Тред
+     * @throws {ApiError}
      */
     async getThreadAssistantById(id: string): Promise<TThreadAssistantDTO> {
-        const { data } = await this.client.http.get<TThreadAssistantDTO>(
-                `assistant__threads/${id}`
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.getThreadAssistantById", async () => {
+            const { data } = await this.client.http.get<TThreadAssistantDTO>(
+                    `assistant__threads/${id}`
+            );
+            return data;
+        });
     }
 
     /**
      * Получение сообщений ассистента
      * @param threadId ID треда
      * @param page Номер страницы
-     * @returns Сообщения
+     * @returns {Promise<IGetMessagesResponse>} Сообщения
+     * @throws {ApiError}
      */
     async getMessagesAssistant(
             params: TMessagesSearchParams
     ): Promise<IGetMessagesResponse> {
-        const { threadId, page = 1 } = params;
-        const { data } = await this.client.http.get<IGetMessagesResponse>(
-                `assistant__thread_messages`,
-                { params: { thread: { equals: threadId }, page } }
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.getMessagesAssistant", async () => {
+            const { threadId, page = 1 } = params;
+            const { data } = await this.client.http.get<IGetMessagesResponse>(
+                    `assistant__thread_messages`,
+                    { params: { thread: { equals: threadId }, page } }
+            );
+            return data;
+        });
     }
 
     /**
      * Создание сообщения
      * @param text Текст сообщения
      * @param threadId ID треда
-     * @returns Созданное сообщение
+     * @returns {Promise<TMessage>} Созданное сообщение
+     * @throws {ApiError}
      */
     async createMessageAssistant(params: {
         text: string;
         threadId: string;
     }): Promise<TMessage> {
-        const { threadId, text } = params;
-        const { data } = await this.client.http.post<TMessage>(
-                `assistant/threads/${threadId}/messages`,
-                { text }
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.createMessageAssistant", async () => {
+            const { threadId, text } = params;
+            const { data } = await this.client.http.post<TMessage>(
+                    `assistant/threads/${threadId}/messages`,
+                    { text }
+            );
+            return data;
+        });
     }
 
     /**
@@ -157,73 +183,102 @@ export class ThreadAssistantApi {
      * @param threadId ID треда
      * @param messageId ID сообщения
      * @param content Новый текст
-     * @returns Обновлённое сообщение
+     * @returns {Promise<TMessage>} Обновлённое сообщение
+     * @throws {ApiError}
      */
     async editMessageAssistant(params: {
         threadId: string;
         messageId: string;
         content: string;
     }): Promise<TMessage> {
-        const { threadId, messageId, content } = params;
-        const { data } = await this.client.http.patch<TMessage>(
-                `/assistant/threads/${threadId}/messages/${messageId}`,
-                { content }
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.editMessageAssistant", async () => {
+            const { threadId, messageId, content } = params;
+            const { data } = await this.client.http.patch<TMessage>(
+                    `/assistant/threads/${threadId}/messages/${messageId}`,
+                    { content }
+            );
+            return data;
+        });
     }
 
     /**
      * Удаление сообщения
      * @param threadId ID треда
      * @param messageId ID сообщения
-     * @returns Удалённое сообщение
+     * @returns {Promise<TMessage>} Удалённое сообщение
+     * @throws {ApiError}
      */
     async deleteMessageAssistant(params: {
         threadId: string;
         messageId: string;
     }): Promise<TMessage> {
-        const { threadId, messageId } = params;
-        const { data } = await this.client.http.delete<TMessage>(
-                `/assistant/threads/${threadId}/messages/${messageId}`
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.deleteMessageAssistant", async () => {
+            const { threadId, messageId } = params;
+            const { data } = await this.client.http.delete<TMessage>(
+                    `/assistant/threads/${threadId}/messages/${messageId}`
+            );
+            return data;
+        });
     }
 
     /**
      * Регенерация сообщения
      * @param threadId ID треда
      * @param messageId ID сообщения
-     * @returns Новое сгенерированное сообщение
+     * @returns {Promise<TMessage>} Новое сгенерированное сообщение
+     * @throws {ApiError}
      */
     async regenerateMessageAssistant(params: {
         threadId: string;
         messageId: string;
     }): Promise<TMessage> {
-        const { threadId, messageId } = params;
-        const { data } = await this.client.http.post<TMessage>(
-                `/assistant/threads/${threadId}/messages/${messageId}/regenerate`
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.regenerateMessageAssistant", async () => {
+            const { threadId, messageId } = params;
+            const { data } = await this.client.http.post<TMessage>(
+                    `/assistant/threads/${threadId}/messages/${messageId}/regenerate`
+            );
+            return data;
+        });
+
     }
 
     /**
      * Удаление треда
      * @param threadId ID треда
      * @returns Результат удаления
+     * @throws {ApiError}
      */
     async deleteThreadAssistant(params: {
         threadId: string;
     }): Promise<TMessage> {
-        const { threadId } = params;
-        const { data } = await this.client.http.delete<TMessage>(
-                `assistant/threads/${threadId}`
-        );
-        return data;
+        return apiCall("ThreadAssistantApi.deleteThreadAssistant", async () => {
+            const { threadId } = params;
+            const { data } = await this.client.http.delete<TMessage>(
+                    `assistant/threads/${threadId}`
+            );
+            return data;
+        });
+
+    }
+
+    /**
+     * Редактирование режима треда
+     * @param threadId ID треда
+     * @param modeId ID режима
+     * @returns Результат удаления
+     * @throws {ApiError}
+     */
+    async editThreadMode(id: string, modeId: string): Promise<any> {
+        return apiCall("ThreadAssistantApi.editThreadMode", async () => {
+            const { data } = await this.client.http.patch(`/assistant/threads/${id}/mode`, { modeId });
+            return data;
+        });
     }
 
     /**
      * @param threadId Идентификатор потока
      * @returns Экземпляр EventSource для обработки событий
+     * @throws {ApiError}
      */
     getThreadMessageStream(threadId: string): EventSource {
         const baseURL = this.client.http.defaults.baseURL;
@@ -234,5 +289,22 @@ export class ThreadAssistantApi {
         const url = `${baseURL}thread/${threadId}/stream?all=1`;
 
         return new EventSource(url);
+    }
+    /**
+     * Получение EventSource для стриминга сообщений треда.
+     *
+     * @param threadId ID треда
+     * @returns {EventSource} Экземпляр EventSource для обработки событий
+     * @throws {ApiError} если EventSource не может быть создан
+     */
+    getThreadStream(threadId: string): EventSource {
+        try {
+            const baseURL = this.client.http.defaults.baseURL;
+            const url = `${baseURL}thread/${threadId}/stream?all=1`;
+            const es = new EventSource(url);
+            return es;
+        } catch (err) {
+            throw new ApiError("Ошибка создания стриминга сообщений треда");
+        }
     }
 }

@@ -16,7 +16,7 @@ export type GptzatorClientOptions = {
   timeoutMs?: number;
 };
 
-const DEFAULT_BASE_URL = 'https://api.dev.gpt-zator.ladcloud.ru/api/';
+const DEFAULT_BASE_URL = 'https://api.gptzator.ru/api/';
 
 export class GptzatorClient {
   /** Хранилище токенов (можно подменить на localStorage) */

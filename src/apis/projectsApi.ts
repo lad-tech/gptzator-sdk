@@ -1,6 +1,8 @@
 import { GptzatorClient } from '../client';
 import { TProjectDTO, TProjectsDTO, TArtefact } from '../types/projects';
 import {ApiError} from "../errors/ApiError";
+import {apiCall} from "../utils/apiCall";
+import qs from 'qs';
 
 /**
  * Класс для работы с проектами
@@ -11,46 +13,53 @@ export class ProjectsApi {
   /**
    * Получение списка проектов с фильтром и пагинацией
    * @param params Параметры запроса
-   * @returns {Promise<TProjectsDTO>} Объект с параметрами пагинации и списком проектов
+   * @returns {Promise<TProjectsDTO>}
+   * @throws {ApiError}
    */
   async getProjects(params?: { search?: string; page: number }): Promise<TProjectsDTO> {
-    const query: any = params?.search
-      ? { where: { name: { contains: params.search } } }
-      : undefined;
-    const { data } = await this.client.http.get<TProjectsDTO>('/projects', {
-      params: { ...query, limit: 20, page: params?.page },
+    return apiCall("ProjectsApi.getProjects", async () => {
+      const query: any = params?.search
+              ? { where: { name: { contains: params.search } } }
+              : undefined;
+      const { data } = await this.client.http.get<TProjectsDTO>('/projects', {
+        params: { ...query, limit: 20, page: params?.page },
+      });
+      return data;
     });
-    return data;
   }
 
   /**
    * Получение проектов конкретного приложения
    * @param appId ID приложения
-   * @returns {Promise<TProjectsDTO>} Объект с параметрами пагинации и списком проектов
+   * @returns {Promise<TProjectsDTO>}
+   * @throws {ApiError}
    */
   async getAppProjects(appId: string): Promise<TProjectsDTO> {
-    const { data } = await this.client.http.get<TProjectsDTO>('/projects', {
-      params: { where: { application: { equals: appId } }, depth: 0 },
+    return apiCall("ProjectsApi.getAppProjects", async () => {
+      const stringified = qs.stringify({ depth: 0, where: { application: { equals: appId } } }, { addQueryPrefix: true });
+      const { data } = await this.client.http.get<TProjectsDTO>(`/projects${stringified}`);
+      return data;
     });
-    return data;
   }
 
   /**
    * Получение проекта по ID
    * @param id ID проекта
+   * @returns {Promise<TProjectDTO>}
+   * @throws {ApiError}
    */
   async getProject(id: string): Promise<TProjectDTO> {
-    const { data } = await this.client.http.get<TProjectDTO>(`/projects/${id}`);
-    return data;
+    return apiCall("ProjectsApi.getProject", async () => {
+      const { data } = await this.client.http.get<TProjectDTO>(`/projects/${id}`);
+      return data;
+    });
   }
 
   /**
    * Создание нового проекта
-   * @param idea Идея проекта
-   * @param applicationId ID приложения
-   * @param isDemo Флаг демо-проекта
-   * @param isTest Флаг тестового проекта
-   * @returns {Promise<TProjectDTO>} Объект проекта
+   * @param params Объект с idea, applicationId, isDemo?, isTest?
+   * @returns {Promise<TProjectDTO>}
+   * @throws {ApiError}
    */
   async createProject(params: {
     idea: string;
@@ -58,40 +67,42 @@ export class ProjectsApi {
     isDemo?: boolean;
     isTest?: boolean;
   }): Promise<TProjectDTO> {
-    const { data } = await this.client.http.post<{ doc: TProjectDTO }>('/projects/', {
-      name: params.idea,
-      idea: params.idea,
-      application: params.applicationId,
-      ...(params.isDemo ? { isDemo: params.isDemo } : {}),
-      ...(params.isTest ? { isTest: params.isTest } : {}),
+    return apiCall("ProjectsApi.createProject", async () => {
+      const body: any = { name: params.idea, idea: params.idea, application: params.applicationId };
+      if (params.isDemo) body.isDemo = params.isDemo;
+      if (params.isTest) body.isTest = params.isTest;
+      const { data } = await this.client.http.post<{ doc: TProjectDTO }>(`/projects/`, body);
+      return data.doc;
     });
-    return data.doc;
   }
 
   /**
    * Обновление действий проекта
    * @param projectId ID проекта
    * @param data Данные для обновления
-   * @returns {Promise<TProjectDTO>} Объект проекта
+   * @returns {Promise<TProjectDTO>}
+   * @throws {ApiError}
    */
   async updateProjectActions(projectId: string, data: any): Promise<TProjectDTO> {
-    const { data: project } = await this.client.http.patch<{ doc: TProjectDTO }>(
-      `/projects/${projectId}`,
-      data,
-    );
-    return project.doc;
+    return apiCall("ProjectsApi.updateProjectActions", async () => {
+      const { data: project } = await this.client.http.patch<{ doc: TProjectDTO }>(`/projects/${projectId}`, data);
+      return project.doc;
+    });
   }
 
   /**
    * Генерация артефактов проекта
    * @param projectId ID проекта
    * @param hasBlocks Флаг наличия шагов
+   * @returns {Promise<TArtefact<any>[]>}
+   * @throws {ApiError}
    */
   async generateArtefact(projectId: string, hasBlocks: boolean): Promise<TArtefact<any>[]> {
-    const { data } = await this.client.http.post<TArtefact<any>[]>(
-      `/projects/${projectId}/generate${hasBlocks ? 'Blocks' : ''}`,
-    );
-    return data;
+    return apiCall("ProjectsApi.generateArtefact", async () => {
+      const path = `/projects/${projectId}/generate${hasBlocks ? "Blocks" : ""}`;
+      const { data } = await this.client.http.post<TArtefact<any>[]>(path);
+      return data;
+    });
   }
 
   /**
@@ -99,26 +110,29 @@ export class ProjectsApi {
    * @param projectId ID проекта
    * @param artefactId ID артефакта
    * @param comment Комментарий к регенерации
+   * @returns {Promise<TArtefact<any>[]>}
+   * @throws {ApiError}
    */
   async regenerateArtefact(
     projectId: string,
     artefactId: string,
     comment?: string,
   ): Promise<TArtefact<any>[]> {
-    const { data } = await this.client.http.post<TArtefact<any>[]>(
-      `/projects/${projectId}/regenerate/${artefactId}`,
-      { comment },
-    );
-    return data;
+    return apiCall("ProjectsApi.regenerateArtefact", async () => {
+      const { data } = await this.client.http.post<TArtefact<any>[]>(`/projects/${projectId}/regenerate/${artefactId}`, { comment });
+      return data;
+    });
   }
 
   /**
    * Удаление проекта
    * @param id ID проекта
+   * @throws {ApiError}
    */
   async deleteProject(id: string): Promise<void> {
-    await this.client.http.delete('/projects', {
-      params: { where: { id: { equals: id } }, depth: 0 },
+    return apiCall("ProjectsApi.deleteProject", async () => {
+      const stringified = qs.stringify({ depth: 0, where: { id: { equals: id } } }, { addQueryPrefix: true });
+      await this.client.http.delete(`/projects${stringified}`);
     });
   }
 
@@ -139,8 +153,8 @@ export class ProjectsApi {
    * @param options.timeoutMs Таймаут ожидания завершения в миллисекундах. По умолчанию `300000` (5 минут).
    * @param options.isDemo Пробрасывается в `createProject` как флаг демо-проекта.
    * @param options.isTest Пробрасывается в `createProject` как флаг тестового проекта.
-   * @returns {Promise<TProjectDTO>} Завершённый проект с заполненными артефактами.
-   * @throws ApiError при сетевой ошибке или при наличии ошибок в самом проекте
+   * @returns {Promise<TProjectDTO>}
+   * @throws {ApiError}
    */
   async callApp(
           applicationId: string,
@@ -160,62 +174,42 @@ export class ProjectsApi {
       isDemo,
       isTest,
     } = options;
-    let project;
 
-    // 1) Создать проект
-    try {
-      project = await this.createProject({
-        idea,
-        applicationId,
-        ...(isDemo !== undefined ? { isDemo } : {}),
-        ...(isTest !== undefined ? { isTest } : {}),
-      });
-    } catch (err: any) {
-      throw new ApiError("Ошибка при создании проекта", err);
-    }
+    // Оборачиваем весь процесс в apiCall для единообразного контекста
+    return apiCall("ProjectsApi.callApp", async () => {
+      // 1) Создание проекта (createProject уже обёрнут в apiCall)
+      const project = await this.createProject({ idea, applicationId, ...(isDemo !== undefined ? { isDemo } : {}), ...(isTest !== undefined ? { isTest } : {}) });
 
-    // 2) Запустить первый шаг
-    try {
-      await this.generateArtefact(project?.id, hasBlocks);
-    } catch (err: any) {
-      throw new ApiError("Ошибка при запуске генерации", err);
-    }
+      // 2) Запуск генерации
+      await this.generateArtefact(project.id, hasBlocks);
 
-    // 3) Ожидание завершения (polling)
-    const start = Date.now();
-    const isGenerating = (project: TProjectDTO): boolean => Boolean(project.generating);
+      // 3) Ожидание завершения с polling
+      const start = Date.now();
+      const isGenerating = (p: TProjectDTO) => Boolean((p as any).generating);
 
-    // Первый опрос сразу после старта, далее — с интервалом
-    while (true) {
-      // таймаут
-      if (Date.now() - start > timeoutMs) {
-        throw new ApiError("Превышено время ожидания генерации проекта");
+      let current: TProjectDTO = project;
+      while (true) {
+        if (Date.now() - start > timeoutMs) {
+          throw new ApiError("Превышено время ожидания генерации проекта");
+        }
+
+        current = await this.getProject(current.id);
+
+        // Бизнес-ошибки, которые приходят в проекте
+        if ((current as any).lastGenerationError) {
+          throw new ApiError(`Ошибка генерации: ${(current as any).lastGenerationError}`);
+        }
+
+        if ((current as any).error) {
+          throw new ApiError(`Ошибка проекта: ${JSON.stringify((current as any).error)}`);
+        }
+
+        if (!isGenerating(current)) {
+          return current;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
       }
-
-      try {
-        project = await this.getProject(project.id);
-      } catch (err: any) {
-        throw new ApiError("Ошибка при получении статуса проекта", err);
-      }
-
-      // проверка на бизнес-ошибки
-      if (project.lastGenerationError) {
-        throw new ApiError(
-                `Ошибка генерации: ${project.lastGenerationError}`
-        );
-      }
-
-      if (project.error) {
-        throw new ApiError(
-                `Ошибка проекта: ${JSON.stringify(project.error)}`
-        );
-      }
-
-      if (!isGenerating(project)) {
-        return project; // Готово: генерация завершена, артефакты внутри проекта
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
-    }
+    });
   }
 }

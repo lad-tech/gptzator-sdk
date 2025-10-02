@@ -1,5 +1,6 @@
 import { GptzatorClient } from '../client';
 import { TFile, TFileDTO } from '../types/files';
+import {apiCall} from "../utils/apiCall";
 
 /**
  * Класс для работы с файлами
@@ -11,69 +12,87 @@ export class FilesApi {
      * Загрузка файла
      * @param formData FormData с файлом
      * @returns Данные о загруженном файле
+     * @throws {ApiError}
      */
     async uploadFile(formData: FormData): Promise<any> {
-        const { data } = await this.client.http.post(`files`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+        return apiCall("FilesApi.uploadFile", async () => {
+            const { data } = await this.client.http.post(`files`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return data;
         });
-        return data;
     }
 
     /**
      * Получение файла по ID
      * @param id ID файла
-     * @returns Файл
+     * @returns {Promise<TFile>} Файл
+     * @throws {ApiError}
      */
     async getFile(id: string): Promise<TFile> {
-        const { data } = await this.client.http.get<TFile>(`files/${id}`);
-        return data;
+        return apiCall("FilesApi.getFile", async () => {
+            const { data } = await this.client.http.get<TFile>(`files/${id}`);
+            return data;
+        });
     }
 
     /**
      * Получение списка файлов по ID
      * @param ids Список ID файлов
-     * @returns Коллекция файлов
+     * @returns {Promise<TFileDTO>} Коллекция файлов
+     * @throws {ApiError}
      */
     async getFilesByIds(ids: string[]): Promise<TFileDTO> {
-        const { data } = await this.client.http.get<TFileDTO>(`files`, {
-            params: { where: { id: { in: ids } } },
+        return apiCall("FilesApi.getFilesByIds", async () => {
+            const { data } = await this.client.http.get<TFileDTO>(`files`, {
+                params: { where: { id: { in: ids } } },
+            });
+            return data;
         });
-        return data;
     }
 
     /**
      * Удаление файла
      * @param fileId ID файла
      * @returns Результат удаления
+     * @throws {ApiError}
      */
     async deleteFile(fileId: string): Promise<any> {
-        const { data } = await this.client.http.delete(`files`, {
-            params: { where: { id: { equals: fileId } } },
+        return apiCall("FilesApi.deleteFile", async () => {
+            const { data } = await this.client.http.delete(`files`, {
+                params: { where: { id: { equals: fileId } } },
+            });
+            return data;
         });
-        return data;
     }
 
     /**
      * Загрузка файла для треда
      * @param formData FormData с файлом
      * @returns Данные о загруженном файле для треда
+     * @throws {ApiError}
      */
     async uploadThreadFile(formData: FormData): Promise<any> {
-        const { data } = await this.client.http.post(`threads_files`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+        return apiCall("FilesApi.uploadThreadFile", async () => {
+            const { data } = await this.client.http.post(`threads_files`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return data;
         });
-        return data;
     }
 
     /**
      * Удаление файла из треда
      * @param fileId ID файла
      * @returns Результат удаления
+     * @throws {ApiError}
      */
     async deleteThreadFile(fileId: string): Promise<any> {
-        const { data } = await this.client.http.delete(`threads_files`, {
-            params: { where: { id: { equals: fileId } } },
+        return apiCall("FilesApi.deleteThreadFile", async () => {
+            const { data } = await this.client.http.delete(`threads_files`, {
+                params: { where: { id: { equals: fileId } } },
+            });
+            return data;
         });
-        return data;
     }
 }
