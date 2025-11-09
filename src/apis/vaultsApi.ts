@@ -29,7 +29,7 @@ export class VaultsApi {
         vaultsPerPage?: number;
     }): Promise<TVaultsDTO> {
         return apiCall("VaultsApi.getVaults", async () => {
-            const { data } = await this.client.http.get<TVaultsDTO>(`vaults`, {
+            const { data } = await this.client.http.get<TVaultsDTO>(`/vaults`, {
                 params,
             });
             return data;
@@ -44,7 +44,7 @@ export class VaultsApi {
      */
     async getVault(id: string): Promise<TVault> {
         return apiCall("VaultsApi.getVault", async () => {
-            const { data } = await this.client.http.get<TVault>(`vaults/${id}`);
+            const { data } = await this.client.http.get<TVault>(`/vaults/${id}`);
             return data;
         });
     }
@@ -57,7 +57,7 @@ export class VaultsApi {
      */
     async getVaultsByIds(ids: string[]): Promise<TVaultsDTO> {
         return apiCall("VaultsApi.getVaultsByIds", async () => {
-            const { data } = await this.client.http.get<TVaultsDTO>(`vaults`, {
+            const { data } = await this.client.http.get<TVaultsDTO>(`/vaults`, {
                 params: { where: { id: { in: ids } } },
             });
             return data;
@@ -72,7 +72,7 @@ export class VaultsApi {
     async getFavouriteVaults(): Promise<TVault[]> {
         return apiCall("VaultsApi.getFavouriteVaults", async () => {
             const { data } = await this.client.http.get<{ user: { favoriteVaults?: TVault[] } }>(
-                    `users/me`
+                    `/users/me`
             );
             return data.user.favoriteVaults ?? [];
         });
@@ -92,7 +92,7 @@ export class VaultsApi {
             const { id, isFavourite } = params;
             const method = isFavourite ? 'POST' : 'DELETE';
             await this.client.http.request({
-                url: `users/me/favorites/vaults/${id}`,
+                url: `/users/me/favorites/vaults/${id}`,
                 method,
             });
         });
@@ -105,7 +105,7 @@ export class VaultsApi {
      */
     async getVaultTags(): Promise<TVaultTagsDTO> {
         return apiCall("VaultsApi.getVaultTags", async () => {
-            const { data } = await this.client.http.get<TVaultTagsDTO>(`vaults_tags`, {
+            const { data } = await this.client.http.get<TVaultTagsDTO>(`/vaults_tags`, {
                 params: { page: 1 },
             });
             return data;
@@ -121,7 +121,7 @@ export class VaultsApi {
     async createVault(data: TCreateVaultForm): Promise<TVault> {
         return apiCall("VaultsApi.createVault", async () => {
             const { data: res } = await this.client.http.post<{ doc: TVault }>(
-                    `vaults?depth=0`,
+                    `/vaults?depth=0`,
                     data
             );
             return res.doc;
@@ -138,7 +138,7 @@ export class VaultsApi {
         return apiCall("VaultsApi.editVault", async () => {
             const { id, ...body } = data;
             const { data: res } = await this.client.http.patch<{ doc: TVault }>(
-                    `vaults/${id}`,
+                    `/vaults/${id}`,
                     body
             );
             return res.doc;
@@ -154,7 +154,7 @@ export class VaultsApi {
      */
     async deleteVault(id: string): Promise<TVaultsDTO> {
         return apiCall("VaultsApi.deleteVault", async () => {
-            const { data } = await this.client.http.delete<TVaultsDTO>(`vaults`, {
+            const { data } = await this.client.http.delete<TVaultsDTO>(`/vaults`, {
                 params: { where: { id: { equals: id } } },
             });
             return data;

@@ -43,7 +43,7 @@ export class WorkspacesApi {
     }): Promise<TWorkspace> {
         return apiCall("WorkspacesApi.createWorkspace", async () => {
             const { data: workspace } = await this.client.http.post<TWorkspace>(
-                    'assistant__workspaces?depth=0',
+                    '/assistant__workspaces?depth=0',
                     data
             );
             return workspace;
@@ -67,7 +67,7 @@ export class WorkspacesApi {
     ): Promise<TWorkspace> {
         return apiCall("WorkspacesApi.updateWorkspace", async () => {
             const { data: workspace } = await this.client.http.patch<TWorkspace>(
-                    `assistant__workspaces/${id}?depth=0`,
+                    `/assistant__workspaces/${id}?depth=0`,
                     data
             );
             return workspace;
@@ -100,7 +100,7 @@ export class WorkspacesApi {
     async getWorkspaceById(id: string): Promise<TWorkspace> {
         return apiCall("WorkspacesApi.getWorkspaceById", async () => {
             const { data } = await this.client.http.get<TWorkspace>(
-                    `assistant__workspaces/${id}?depth=0`
+                    `/assistant__workspaces/${id}?depth=0`
             );
             return data;
         });

@@ -22,7 +22,7 @@ export class ApiTemplatesApi {
         vaultsPerPage?: number;
     }): Promise<TApiTemplatesDTO> {
         return apiCall("ApiTemplatesApi.getApiTemplates", async () => {
-            const { data } = await this.client.http.get<TApiTemplatesDTO>(`apps_steps_api_templates`, {
+            const { data } = await this.client.http.get<TApiTemplatesDTO>(`/apps_steps_api_templates`, {
                 params: {
                     name: { contains: params.search },
                     page: params.page,
@@ -41,7 +41,7 @@ export class ApiTemplatesApi {
      */
     async getApiTemplate(id: string): Promise<TApiTemplate> {
         return apiCall("ApiTemplatesApi.getApiTemplate", async () => {
-            const { data } = await this.client.http.get<TApiTemplate>(`apps_steps_api_templates/${id}`);
+            const { data } = await this.client.http.get<TApiTemplate>(`/apps_steps_api_templates/${id}`);
             return data;
         });
     }

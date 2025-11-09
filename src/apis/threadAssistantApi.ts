@@ -30,7 +30,7 @@ export class ThreadAssistantApi {
     }): Promise<TThreadsAssistantDTO> {
         return apiCall("ThreadAssistantApi.getThreadsByWorkspaceId", async () => {
             const { data } = await this.client.http.get<TThreadsAssistantDTO>(
-                    `assistant__threads`,
+                    `/assistant__threads`,
                     { params }
             );
             return data;
@@ -52,7 +52,7 @@ export class ThreadAssistantApi {
     }): Promise<TThreadsAssistantDTO> {
         return apiCall("ThreadAssistantApi.getThreadsByAssistantId", async () => {
             const { data } = await this.client.http.get<TThreadsAssistantDTO>(
-                    `assistant__threads`,
+                    `/assistant__threads`,
                     { params }
             );
             return data;
@@ -73,7 +73,7 @@ export class ThreadAssistantApi {
         return apiCall("ThreadAssistantApi.createThreadByWorkspaceId", async () => {
             const { id, ...body } = params;
             const { data } = await this.client.http.post<TThreadAssistantDTO>(
-                    `assistant/workspaces/${id}/threads?depth=0`,
+                    `/assistant/workspaces/${id}/threads?depth=0`,
                     body
             );
             return data;
@@ -115,7 +115,7 @@ export class ThreadAssistantApi {
         return apiCall("ThreadAssistantApi.updateThreadAssistant", async () => {
             const { id, ...body } = thread;
             const { data } = await this.client.http.patch<TThreadAssistantDTO>(
-                    `assistant__threads/${id}?depth=0`,
+                    `/assistant__threads/${id}?depth=0`,
                     body
             );
             return data;
@@ -131,7 +131,7 @@ export class ThreadAssistantApi {
     async getThreadAssistantById(id: string): Promise<TThreadAssistantDTO> {
         return apiCall("ThreadAssistantApi.getThreadAssistantById", async () => {
             const { data } = await this.client.http.get<TThreadAssistantDTO>(
-                    `assistant__threads/${id}`
+                    `/assistant__threads/${id}`
             );
             return data;
         });
@@ -150,7 +150,7 @@ export class ThreadAssistantApi {
         return apiCall("ThreadAssistantApi.getMessagesAssistant", async () => {
             const { threadId, page = 1 } = params;
             const { data } = await this.client.http.get<IGetMessagesResponse>(
-                    `assistant__thread_messages`,
+                    `/assistant__thread_messages`,
                     { params: { thread: { equals: threadId }, page } }
             );
             return data;
@@ -171,7 +171,7 @@ export class ThreadAssistantApi {
         return apiCall("ThreadAssistantApi.createMessageAssistant", async () => {
             const { threadId, text } = params;
             const { data } = await this.client.http.post<TMessage>(
-                    `assistant/threads/${threadId}/messages`,
+                    `/assistant/threads/${threadId}/messages`,
                     { text }
             );
             return data;
@@ -254,7 +254,7 @@ export class ThreadAssistantApi {
         return apiCall("ThreadAssistantApi.deleteThreadAssistant", async () => {
             const { threadId } = params;
             const { data } = await this.client.http.delete<TMessage>(
-                    `assistant/threads/${threadId}`
+                    `/assistant/threads/${threadId}`
             );
             return data;
         });
@@ -288,7 +288,7 @@ export class ThreadAssistantApi {
             if (!baseURL) {
                 throw new ApiError("Axios instance must have baseURL for SSE connection");
             }
-            const url = `${baseURL}thread/${threadId}/stream?all=1`;
+            const url = `${baseURL}/thread/${threadId}/stream?all=1`;
             const es = new EventSource(url);
             return es;
         } catch (err) {

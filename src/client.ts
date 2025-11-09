@@ -9,14 +9,12 @@ import {VaultsApi} from "./apis/vaultsApi";
 import {WorkspacesApi} from "./apis/workspacesApi";
 
 export type GptzatorClientOptions = {
-  baseURL?: string; // опционально
+  baseURL: string;
   tokenStorage?: TokenStorage; // по умолчанию InMemory
   refreshFn?: RefreshFn; // если есть refresh эндпоинт
   onAuthFailed?: () => void | Promise<void>;
   timeoutMs?: number;
 };
-
-const DEFAULT_BASE_URL = 'https://api.gptzator.ru/api/';
 
 export class GptzatorClient {
   /** Хранилище токенов (можно подменить на localStorage) */
@@ -40,11 +38,14 @@ export class GptzatorClient {
   public readonly vaults: VaultsApi;
   public readonly workspaces: WorkspacesApi;
 
-  constructor(opts: GptzatorClientOptions = {}) {
+  constructor(opts: GptzatorClientOptions) {
+    if (!opts?.baseURL || typeof opts.baseURL !== "string") {
+      throw new Error("[GptzatorClient] Missing required parameter: baseURL");
+    }
     this.tokenStorage = opts.tokenStorage ?? new InMemoryTokenStorage();
 
     const http = new HttpClient({
-      baseURL: opts.baseURL ?? DEFAULT_BASE_URL,
+      baseURL: opts.baseURL,
       tokenStorage: this.tokenStorage,
       refreshFn: opts.refreshFn,
       onAuthFailed: opts.onAuthFailed,

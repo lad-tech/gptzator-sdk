@@ -23,7 +23,7 @@ export class InvitesApi {
         invitesPerPage?: number;
     }): Promise<TInvitesDTO> {
         return apiCall("InvitesApi.getInvitesList", async () => {
-            const { data } = await this.client.http.get<TInvitesDTO>(`orgs_invites`, {
+            const { data } = await this.client.http.get<TInvitesDTO>(`/orgs_invites`, {
                 params: {
                     email: { contains: params.search },
                     page: params.page,
@@ -47,7 +47,7 @@ export class InvitesApi {
         return apiCall("InvitesApi.getInvite", async () => {
             const { data } = await this.client.http.get<
                     Pick<TInvite, 'organization' | 'email'>
-            >(`orgs/invites/${organizationInviteToken}`);
+            >(`/orgs/invites/${organizationInviteToken}`);
             return data;
         });
     }
@@ -60,7 +60,7 @@ export class InvitesApi {
      */
     async createInvite(email: string): Promise<TInvite> {
         return apiCall("InvitesApi.createInvite", async () => {
-            const { data } = await this.client.http.post<TInvite>(`orgs_invites`, {
+            const { data } = await this.client.http.post<TInvite>(`/orgs_invites`, {
                 email,
             });
             return data;
@@ -76,7 +76,7 @@ export class InvitesApi {
     async deleteInvite(inviteId: string): Promise<TInvite> {
         return apiCall("InvitesApi.deleteInvite", async () => {
             const { data } = await this.client.http.delete<TInvite>(
-                    `orgs_invites/${inviteId}`
+                    `/orgs_invites/${inviteId}`
             );
             return data;
         });

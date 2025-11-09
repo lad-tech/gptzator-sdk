@@ -19,7 +19,7 @@ export class SubscribesApi {
     async getSubscribes(): Promise<TSubscribeDTO> {
         return apiCall("SubscribesApi.getSubscribes", async () => {
             const { data } = await this.client.http.get<TSubscribeDTO>(
-                    `subscribes?depth=1`
+                    `/subscribes?depth=1`
             );
             return data;
         });
@@ -32,7 +32,7 @@ export class SubscribesApi {
      */
     async getProducts(): Promise<TProductDTO> {
         return apiCall("SubscribesApi.getProducts", async () => {
-            const { data } = await this.client.http.get<TProductDTO>(`products`);
+            const { data } = await this.client.http.get<TProductDTO>(`/products`);
             return data;
         });
     }
@@ -48,7 +48,7 @@ export class SubscribesApi {
     ): Promise<{ uri: string }> {
         return apiCall("SubscribesApi.getSubscribeUrl", async () => {
             const { data } = await this.client.http.get<{ uri: string }>(
-                    `transactions/paymenturi?productId=${subscribeId}`
+                    `/transactions/paymenturi?productId=${subscribeId}`
             );
             return data;
         });
@@ -65,7 +65,7 @@ export class SubscribesApi {
     }): Promise<{ message?: string }> {
         return apiCall("SubscribesApi.applyCoupon", async () => {
             const { data } = await this.client.http.post<{ message?: string }>(
-                    `coupons/apply`,
+                    `/coupons/apply`,
                     { couponCode: params.couponCode }
             );
             return data;

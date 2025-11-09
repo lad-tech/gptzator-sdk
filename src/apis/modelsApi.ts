@@ -22,7 +22,7 @@ export class ModelsApi {
      */
     async getModels(): Promise<TModel[]> {
         return apiCall("ModelsApi.getModels", async () => {
-            const { data } = await this.client.http.get<TModelsDTO>(`models`, {
+            const { data } = await this.client.http.get<TModelsDTO>(`/models`, {
                 params: { limit: 20 },
             });
             return data.docs;
@@ -36,7 +36,7 @@ export class ModelsApi {
      */
     async getActiveModels(): Promise<TModel[]> {
         return apiCall("ModelsApi.getActiveModels", async () => {
-            const { data } = await this.client.http.get<TModelsDTO>(`models`, {
+            const { data } = await this.client.http.get<TModelsDTO>(`/models`, {
                 params: {
                     limit: 20,
                     where: { active: { equals: true } },
@@ -53,7 +53,7 @@ export class ModelsApi {
      */
     async getLlmModels(): Promise<TLlmModel[]> {
         return apiCall("ModelsApi.getLlmModels", async () => {
-            const { data } = await this.client.http.get<TLlmModelsDTO>(`llm_models`, {
+            const { data } = await this.client.http.get<TLlmModelsDTO>(`/llm_models`, {
                 params: { limit: 20 },
             });
             return data.docs;
@@ -69,7 +69,7 @@ export class ModelsApi {
     async getEmbeddingModels(): Promise<TEmbeddingModel[]> {
         return apiCall("ModelsApi.getEmbeddingModels", async () => {
             const { data } = await this.client.http.get<TEmbeddingModelDTO>(
-                    `embedding_models`
+                    `/embedding_models`
             );
             return data.docs;
         });

@@ -69,7 +69,7 @@ export class ThreadsApi {
         fileIds?: string[];
     }): Promise<TThreadDTO> {
         return apiCall("ThreadsApi.createThread", async () => {
-            const { data: newThread } = await this.client.http.post<TThreadDTO>("threads/create", data);
+            const { data: newThread } = await this.client.http.post<TThreadDTO>("/threads/create", data);
             return newThread
         });
     }
@@ -83,7 +83,7 @@ export class ThreadsApi {
      */
     async deleteThread(id: string): Promise<TThreadDTO> {
         return apiCall("ThreadsApi.deleteThread", async () => {
-            const { data } = await this.client.http.delete<TThreadDTO>(`threads/${id}`);
+            const { data } = await this.client.http.delete<TThreadDTO>(`/threads/${id}`);
             return data;
         });
     }
@@ -103,7 +103,7 @@ export class ThreadsApi {
     }): Promise<TThreadDTO> {
         return apiCall("ThreadsApi.updateThreadVault", async () => {
             const { data: threadData } = await this.client.http.post<TThreadDTO>(
-                    `threads/${data.id}/set-context`,
+                    `/threads/${data.id}/set-context`,
                     { vaultIds: data.vaultIds }
             );
             return threadData;
@@ -124,7 +124,7 @@ export class ThreadsApi {
         page?: number;
     }): Promise<TMessagesDTO> {
         return apiCall("ThreadsApi.getMessages", async () => {
-            const { data } = await this.client.http.get<TMessagesDTO>("threads_messages", { params });
+            const { data } = await this.client.http.get<TMessagesDTO>("/threads_messages", { params });
             return data;
         });
     }
@@ -137,7 +137,7 @@ export class ThreadsApi {
      */
     async getGenerationTypes(): Promise<TGenerationTypeDTO> {
         return apiCall("ThreadsApi.getGenerationTypes", async () => {
-            const { data } = await this.client.http.get<TGenerationTypeDTO>("threads_generation_types");
+            const { data } = await this.client.http.get<TGenerationTypeDTO>("/threads_generation_types");
             return data;
         });
     }
@@ -156,7 +156,7 @@ export class ThreadsApi {
         typeId: string;
     }): Promise<TThreadDTO> {
         return apiCall("ThreadsApi.updateGenerationType", async () => {
-            const { data: threadData } = await this.client.http.patch<TThreadDTO>(`threads/${data.threadId}`, {
+            const { data: threadData } = await this.client.http.patch<TThreadDTO>(`/threads/${data.threadId}`, {
                 generationType: data.typeId,
             });
             return threadData;
@@ -178,7 +178,7 @@ export class ThreadsApi {
         modelId: string;
     }): Promise<TThreadDTO> {
         return apiCall("ThreadsApi.updateThreadModel", async () => {
-            const { data: threadData } = await this.client.http.patch<TThreadDTO>(`threads/${data.threadId}`, {
+            const { data: threadData } = await this.client.http.patch<TThreadDTO>(`/threads/${data.threadId}`, {
                 model: data.modelId,
             });
             return threadData;
@@ -201,7 +201,7 @@ export class ThreadsApi {
     }): Promise<TMessage> {
         return apiCall("ThreadsApi.createMessage", async () => {
             const { data: message } = await this.client.http.post<TMessage>(
-                    `threads/${data.threadId}/messages`,
+                    `/threads/${data.threadId}/messages`,
                     { text: data.text }
             );
             return message;
@@ -226,7 +226,7 @@ export class ThreadsApi {
     }): Promise<TMessage> {
         return apiCall("ThreadsApi.editMessage", async () => {
             const { data: message } = await this.client.http.patch<TMessage>(
-                    `threads/${data.threadId}/messages/${data.messageId}`,
+                    `/threads/${data.threadId}/messages/${data.messageId}`,
                     { content: data.content }
             );
             return message;
@@ -249,7 +249,7 @@ export class ThreadsApi {
     }): Promise<TMessage> {
         return apiCall("ThreadsApi.deleteMessage", async () => {
             const { data: message } = await this.client.http.delete<TMessage>(
-                    `threads/${data.threadId}/messages/${data.messageId}`
+                    `/threads/${data.threadId}/messages/${data.messageId}`
             );
             return message;
         });
@@ -271,7 +271,7 @@ export class ThreadsApi {
     }): Promise<TMessage> {
         return apiCall("ThreadsApi.regenerateMessage", async () => {
             const { data: message } = await this.client.http.post<TMessage>(
-                    `threads/${data.threadId}/messages/${data.messageId}/regenerate`
+                    `/threads/${data.threadId}/messages/${data.messageId}/regenerate`
             );
             return message;
         });
@@ -293,7 +293,7 @@ export class ThreadsApi {
     }): Promise<TMessage> {
         return apiCall("ThreadsApi.attachFilesToThread", async () => {
             const { data: message } = await this.client.http.post<TMessage>(
-                    `threads/${data.threadId}/files/attach`,
+                    `/threads/${data.threadId}/files/attach`,
                     { fileIds: data.fileIds }
             );
             return message;

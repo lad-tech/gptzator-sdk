@@ -61,7 +61,6 @@ yarn add @lad-tech/gptzator-sdk
 ```ts
 import { GptzatorClient } from "@lad-tech/gptzator-sdk";
 
-// "https://your-api.com" используется для on-premise
 const client = new GptzatorClient("https://your-api.com");
 
 // автоматическое сохранение token внутри инстанса cleint при вызове
@@ -76,7 +75,6 @@ client.user.signupUser("email", "password", "policy", "phone")
 ```ts
 import { GptzatorClient } from "@lad-tech/gptzator-sdk";
 
-// "https://your-api.com" используется для on-premise
 const client = new GptzatorClient("https://your-api.com");
 
 // Сохранить токены (например, после логина)
@@ -99,7 +97,6 @@ Authorization: `Bearer ACCESS_TOKEN`
 ```ts
 import { GptzatorClient } from "@lad-tech/gptzator-sdk";
 
-// "https://your-api.com" используется для on-premise
 const client = new GptzatorClient("https://your-api.com", tokenStorage); // type TokenStorage
 ```
 

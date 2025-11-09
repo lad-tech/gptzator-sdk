@@ -25,7 +25,7 @@ export class SourcesApi {
         search?: string;
     }): Promise<TSourcesDTO> {
         const { data } = await this.client.http.get<TSourcesDTO>(
-                `assistant__sources`,
+                `/assistant__sources`,
                 {
                     params: {
                         ...(params.ids?.length ? { id: { in: params.ids } } : {}),
@@ -47,7 +47,7 @@ export class SourcesApi {
     async uploadFileSource(formData: FormData): Promise<TFileSource> {
         return apiCall("SourcesApi.uploadFileSource", async () => {
             const { data } = await this.client.http.post<TFileSource>(
-                    `assistant__source_files`,
+                    `/assistant__source_files`,
                     formData
             );
             return data;
@@ -70,7 +70,7 @@ export class SourcesApi {
         return apiCall("SourcesApi.createSource", async () => {
             const { workspaceId, ...data } = params;
             const { data: res } = await this.client.http.post<any>(
-                    `assistant/workspaces/${workspaceId}/sources`,
+                    `/assistant/workspaces/${workspaceId}/sources`,
                     data
             );
             return res;
@@ -93,7 +93,7 @@ export class SourcesApi {
         return apiCall("SourcesApi.updateSource", async () => {
             const { id, ...data } = params;
             const { data: res } = await this.client.http.patch<{ doc: TSourceDTO }>(
-                    `assistant/sources/${id}`,
+                    `/assistant/sources/${id}`,
                     data
             );
             return res;
@@ -113,7 +113,7 @@ export class SourcesApi {
     }): Promise<any> {
         return apiCall("SourcesApi.deleteSource", async () => {
             const { data } = await this.client.http.delete<any>(
-                    `assistant/workspaces/${params.workspaceId}/sources/${params.sourceId}`
+                    `/assistant/workspaces/${params.workspaceId}/sources/${params.sourceId}`
             );
             return data;
         });
