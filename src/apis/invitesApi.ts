@@ -13,21 +13,21 @@ export class InvitesApi {
      * @param params Параметры запроса
      * @param params.search Поиск по email
      * @param params.page Номер страницы
-     * @param params.invitesPerPage Количество приглашений на страницу
+     * @param params.limit Количество приглашений на страницу
      * @returns {Promise<TInvitesDTO>} Коллекция приглашений
      * @throws {ApiError}
      */
     async getInvitesList(params: {
         search?: string;
         page: number;
-        invitesPerPage?: number;
+        limit?: number;
     }): Promise<TInvitesDTO> {
         return apiCall("InvitesApi.getInvitesList", async () => {
             const { data } = await this.client.http.get<TInvitesDTO>(`/orgs_invites`, {
                 params: {
                     email: { contains: params.search },
                     page: params.page,
-                    limit: params.invitesPerPage,
+                    limit: params.limit,
                     depth: 0,
                 },
             });

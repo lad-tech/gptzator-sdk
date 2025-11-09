@@ -12,21 +12,21 @@ export class ApiTemplatesApi {
      * Получение списка API-шаблонов
      * @param search Поисковая строка
      * @param page Номер страницы
-     * @param vaultsPerPage Количество элементов на странице (по умолчанию `TEMPLATES_PER_PAGE`)
+     * @param limit Количество элементов на странице
      * @returns {Promise<TApiTemplatesDTO>} Коллекция API-шаблонов
      * @throws {ApiError}
      */
     async getApiTemplates(params: {
         search?: string;
         page: number;
-        vaultsPerPage?: number;
+        limit?: number;
     }): Promise<TApiTemplatesDTO> {
         return apiCall("ApiTemplatesApi.getApiTemplates", async () => {
             const { data } = await this.client.http.get<TApiTemplatesDTO>(`/apps_steps_api_templates`, {
                 params: {
                     name: { contains: params.search },
                     page: params.page,
-                    limit: params.vaultsPerPage,
+                    limit: params.limit,
                 },
             });
             return data;

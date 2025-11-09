@@ -42,6 +42,7 @@ export class ThreadAssistantApi {
      * @param id ID ассистента
      * @param page Номер страницы
      * @param search Поисковый запрос
+     * @param limit Количество элементов на странице
      * @returns {Promise<TThreadsAssistantDTO>} Коллекция тредов
      * @throws {ApiError}
      */
@@ -49,6 +50,7 @@ export class ThreadAssistantApi {
         id: string;
         page: number;
         search?: string;
+        limit?: string;
     }): Promise<TThreadsAssistantDTO> {
         return apiCall("ThreadAssistantApi.getThreadsByAssistantId", async () => {
             const { data } = await this.client.http.get<TThreadsAssistantDTO>(
@@ -141,6 +143,7 @@ export class ThreadAssistantApi {
      * Получение сообщений ассистента
      * @param threadId ID треда
      * @param page Номер страницы
+     * @param limit количество записей на страницу
      * @returns {Promise<IGetMessagesResponse>} Сообщения
      * @throws {ApiError}
      */
@@ -148,10 +151,10 @@ export class ThreadAssistantApi {
             params: TMessagesSearchParams
     ): Promise<IGetMessagesResponse> {
         return apiCall("ThreadAssistantApi.getMessagesAssistant", async () => {
-            const { threadId, page = 1 } = params;
+            const { threadId, page, limit = 1 } = params;
             const { data } = await this.client.http.get<IGetMessagesResponse>(
                     `/assistant__thread_messages`,
-                    { params: { thread: { equals: threadId }, page } }
+                    { params: { thread: { equals: threadId }, page, limit } }
             );
             return data;
         });

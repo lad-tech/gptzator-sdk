@@ -19,7 +19,11 @@ export class AppsApi {
 
   /**
    * Получение списка приложений с фильтром и пагинацией
-   * @param params Параметры фильтрации и пагинации
+   * @param tag поиск по тэгу
+   * @param author поиск по автору
+   * @param page Номер страницы
+   * @param search Поисковый запрос
+   * @param limit Количество элементов на странице
    * @throws {ApiError} Когда запрос не удался
    */
   async getApps(params: {
@@ -27,7 +31,7 @@ export class AppsApi {
     search?: string;
     page: number;
     author?: string;
-    appsPerPage?: number;
+    limit?: number;
   }): Promise<TAppsDTO> {
     return apiCall("AppsApi.getApps", async () => {
       const query: any = { name: { contains: params.search } };
@@ -35,7 +39,7 @@ export class AppsApi {
       if (params.author) query.author = { equals: params.author };
 
       const { data } = await this.client.http.get<TAppsDTO>('/apps', {
-        params: { ...query, limit: params.appsPerPage },
+        params: { ...query, limit: params.limit },
       });
 
       return data;
@@ -183,7 +187,7 @@ export class AppsApi {
 
   /**
    * Получение шаблонов настроек приложения
-   * @param params Параметры: appId, search, page, templatesPerPage
+   * @param params Параметры: appId, search, page, limit
    * @returns {Promise<TSettingsTemplateDTO>}
    * @throws {ApiError}
    */
@@ -191,14 +195,14 @@ export class AppsApi {
     appId: string;
     search?: string;
     page: number;
-    templatesPerPage?: number;
+    limit?: number;
   }): Promise<TSettingsTemplateDTO> {
     return apiCall("AppsApi.getSettingsTemplates", async () => {
       const query: any = { app: { equals: params.appId } };
       if (params.search) query.name = { contains: params.search };
 
       const { data } = await this.client.http.get<TSettingsTemplateDTO>('/apps_settings', {
-        params: { ...query, limit: params.templatesPerPage },
+        params: { ...query, limit: params.limit },
       });
       return data;
     });

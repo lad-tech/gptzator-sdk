@@ -19,7 +19,7 @@ export class ThreadsApi {
 
     /**
      * Получить список тредов с пагинацией и поиском
-     * @param params Параметры: search?, page
+     * @param params Параметры: search?, page, limit?
      * @returns {Promise<TThreadsDTO>}
      * @throws {ApiError}
      */
@@ -31,7 +31,7 @@ export class ThreadsApi {
             }
             const { search, page } = params;
             const where = search ? { title: { contains: search } } : undefined;
-            const stringified = qs.stringify({ ...(where ? { where } : {}), limit: 20, page }, { addQueryPrefix: true });
+            const stringified = qs.stringify({ ...(where ? { where } : {}), limit: params.limit ?? 20, page }, { addQueryPrefix: true });
             const { data } = await this.client.http.get<TThreadsDTO>(`/threads${stringified}`);
             return data;
         });
@@ -115,13 +115,15 @@ export class ThreadsApi {
      *
      * @param {Object} params - Параметры запроса.
      * @param {string} params.threadId - Идентификатор потока.
-     * @param {number} [params.page=1] - Номер страницы.
+     * @param {number} params.page - Номер страницы.
+     * @param {number} params.limit - Количество элементов на странице
      * @returns {Promise<TMessagesDTO>} Список сообщений.
      * @throws {ApiError}
      */
     async getMessages(params: {
         threadId: string;
         page?: number;
+        limit?: number;
     }): Promise<TMessagesDTO> {
         return apiCall("ThreadsApi.getMessages", async () => {
             const { data } = await this.client.http.get<TMessagesDTO>("/threads_messages", { params });

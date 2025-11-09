@@ -15,13 +15,14 @@ export class AssistantsApi {
     /**
      * Получение списка ассистентов
      * @param search Поисковая строка
+     * @param limit Количество элементов на странице
      * @returns Promise<{ assistants: TAssistant[] }> Список ассистентов
      * @throws {ApiError}
      */
-    async getAssistants(search?: string): Promise<{ assistants: TAssistant[] }> {
+    async getAssistants(search?: string, limit?: number): Promise<{ assistants: TAssistant[] }> {
         return apiCall("AssistantsApi.getAssistants", async () => {
             const { data } = await this.client.http.get<{ assistants: TAssistant[] }>('/assistant/assistants', {
-                params: { search }
+                params: { search, limit }
             });
             return data;
         });

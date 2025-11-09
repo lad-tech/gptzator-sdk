@@ -172,7 +172,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с приложениями.
 
-- **`getApps(): Promise<TAppsDTO>`**  
+- **`getApps(params: {tag?: string; search?: string; page: number; author?: string; limit?: number}): Promise<TAppsDTO>`**  
   Список приложений.    
   @throws `ApiError` при сетевой ошибке.
 
@@ -220,7 +220,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
   Получение тегов приложений.  
   @throws `ApiError` при сетевой ошибке.
 
-- **`getSettingsTemplates(limit: number): Promise<TSettingsTemplateDTO>`**  
+- **`getSettingsTemplates(params: {appId: string; search?: string; page: number; limit?: number}): Promise<TSettingsTemplateDTO>`**  
   Получение шаблонов настроек приложения.  
   @throws `ApiError` при сетевой ошибке.
 
@@ -247,7 +247,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с проектами.
 
-- **`getProjects(params?: { search?: string; page: number }): Promise<TProjectsDTO>`**  
+- **`getProjects(params?: { search?: string; page: number, limit?: number }): Promise<TProjectsDTO>`**  
   Получение списка проектов с фильтром и пагинацией.  
   @throws `ApiError`.
 
@@ -296,7 +296,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с тредами (чатами).
 
-- **`getThreads(params?: TThreadsSearchParams): Promise<TThreadsDTO>`**  
+- **`getThreads(params?: {search?: string; limit?: string; page: number}): Promise<TThreadsDTO>`**  
   Получить список тредов с пагинацией и поиском.  
   @throws `ApiError`.
 
@@ -316,7 +316,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
   Обновить список хранилищ (vaults), привязанных к треду.  
   @throws `ApiError`.
 
-- **`getMessages(params: { threadId: string; page?: number }): Promise<TMessagesDTO>`**  
+- **`getMessages(params: { threadId: string; page?: number, limit?: number }): Promise<TMessagesDTO>`**  
   Получить список сообщений в треде.  
   @throws `ApiError`.
 
@@ -359,7 +359,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с ассистентами.
 
-- **`getAssistants(search?: string): Promise<{ assistants: TAssistant[] }>`**  
+- **`getAssistants(search?: string, limit?: number): Promise<{ assistants: TAssistant[] }>`**  
   Получение списка ассистентов  
   @throws `ApiError`.
 
@@ -394,7 +394,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с шаблонами API.
 
-- **`getApiTemplates(params: { search?: string; page: number; vaultsPerPage?: number }): Promise<TApiTemplatesDTO>`**  
+- **`getApiTemplates(params: { search?: string; page: number; limit?: number }): Promise<TApiTemplatesDTO>`**  
   Получение списка API-шаблонов  
   @throws `ApiError`.
 
@@ -467,7 +467,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с инвайтами.
 
-- **`getInvitesList(params: { search?: string; page: number; invitesPerPage?: number }): Promise<TInvitesDTO>`**  
+- **`getInvitesList(params: { search?: string; page: number; limit?: number }): Promise<TInvitesDTO>`**  
   Получение списка приглашений  
   @throws `ApiError`.
 
@@ -490,7 +490,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с источниками данных.
 
-- **`getSources(params: { ids?: string[]; search?: string }): Promise<TSourcesDTO>`**  
+- **`getSources(params: { ids?: string[]; search?: string, limit?: number }): Promise<TSourcesDTO>`**  
   Получение списка источников  
   @throws `ApiError`.
 
@@ -544,7 +544,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
   Получение тредов по workspaceId  
   @throws `ApiError`.
 
-- **`getThreadsByAssistantId(params: { id: string; page: number; search?: string }): Promise<TThreadsAssistantDTO>`**  
+- **`getThreadsByAssistantId(params: { id: string; page: number; search?: string, limit?: number }): Promise<TThreadsAssistantDTO>`**  
   Получение тредов по assistantId  
   @throws `ApiError`.
 
@@ -564,7 +564,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
   Получение треда по ID  
   @throws `ApiError`.
 
-- **`getMessagesAssistant( params: TMessagesSearchParams ): Promise<IGetMessagesResponse>`**  
+- **`getMessagesAssistant( params: {threadId: string; page?: number, limit?: number }): Promise<IGetMessagesResponse>`**  
   Получение сообщений ассистента  
   @throws `ApiError`.
 
@@ -646,7 +646,7 @@ const client = new GptzatorClient("https://your-api.com", tokenStorage); // type
 
 Работа с рабочими пространствами.
 
-- **`getWorkspaces(params?: { search?: string }): Promise<{ workspaces: TWorkspace[] }>`**  
+- **`getWorkspaces(params?: { search?: string, limit?: number }): Promise<{ workspaces: TWorkspace[] }>`**  
   Получить список рабочих пространств  
   @throws `ApiError`.
 

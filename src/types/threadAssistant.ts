@@ -45,7 +45,7 @@ export type IGetThreadByIdRequest = string;
 /** Ответ при получении сообщений */
 export type IGetMessagesResponse = TMessagesDTO;
 /** Параметры поиска сообщений */
-export type TMessagesSearchParams = { threadId: string; page?: number };
+export type TMessagesSearchParams = { threadId: string; page?: number, limit?: number };
 
 /**
  * Элемент варианта ответа в сообщении

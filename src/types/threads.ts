@@ -88,5 +88,6 @@ export type TGenerationTypeDTO = TCollection<TGenerationType>;
 
 export type TThreadsSearchParams = {
     search?: string;
+    limit?: string;
     page: number;
 };

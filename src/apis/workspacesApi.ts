@@ -13,10 +13,11 @@ export class WorkspacesApi {
      *
      * @param params Параметры фильтрации списка
      * @param params.search Поисковая строка (опционально)
+     * @param params.limit Количество элементов на странице
      * @returns {Promise<{ workspaces: TWorkspace[] }>} Объект со списком рабочих пространств
      * @throws {ApiError}
      */
-    async getWorkspaces(params?: { search?: string }): Promise<{ workspaces: TWorkspace[] }> {
+    async getWorkspaces(params?: { search?: string, limit?: number }): Promise<{ workspaces: TWorkspace[] }> {
         return apiCall("WorkspacesApi.getWorkspaces", async () => {
             const { data } = await this.client.http.get<{ workspaces: TWorkspace[] }>(
                     '/assistant/workspaces',

@@ -12,17 +12,19 @@ export class ProjectsApi {
 
   /**
    * Получение списка проектов с фильтром и пагинацией
-   * @param params Параметры запроса
+   * @param page поиск по странице
+   * @param search Поисковый запрос
+   * @param limit Количество элементов на странице
    * @returns {Promise<TProjectsDTO>}
    * @throws {ApiError}
    */
-  async getProjects(params?: { search?: string; page: number }): Promise<TProjectsDTO> {
+  async getProjects(params?: { search?: string; page: number, limit?: number }): Promise<TProjectsDTO> {
     return apiCall("ProjectsApi.getProjects", async () => {
       const query: any = params?.search
               ? { where: { name: { contains: params.search } } }
               : undefined;
       const { data } = await this.client.http.get<TProjectsDTO>('/projects', {
-        params: { ...query, limit: 20, page: params?.page },
+        params: { ...query, limit: params?.limit ?? 20, page: params?.page },
       });
       return data;
     });

@@ -17,12 +17,14 @@ export class SourcesApi {
      * @param params Параметры фильтрации
      * @param params.ids Список ID источников
      * @param params.search Поиск по имени источника
+     * @param params.limit Количество элементов на странице
      * @returns {Promise<TSourcesDTO>} Коллекция источников
      * @throws {ApiError}
      */
     async getSources(params: {
         ids?: string[];
         search?: string;
+        limit?: string;
     }): Promise<TSourcesDTO> {
         const { data } = await this.client.http.get<TSourcesDTO>(
                 `/assistant__sources`,
@@ -30,7 +32,7 @@ export class SourcesApi {
                     params: {
                         ...(params.ids?.length ? { id: { in: params.ids } } : {}),
                         ...(params.search ? { name: { contains: params.search } } : {}),
-                        limit: 50,
+                        limit: params.limit ?? 50,
                         page: 1,
                     },
                 }
@@ -81,14 +83,14 @@ export class SourcesApi {
      * Обновление источника
      * @param id ID источника
      * @param name Новое имя источника
-     * @param sesctiption (опционально) Описание
+     * @param description (опционально) Описание
      * @returns {Promise<TSourceDTO>} Обновлённый источник
      * @throws {ApiError}
      */
     async updateSource(params: {
         id: string;
         name: string;
-        sesctiption?: string;
+        description?: string;
     }): Promise<{ doc: TSourceDTO }> {
         return apiCall("SourcesApi.updateSource", async () => {
             const { id, ...data } = params;
